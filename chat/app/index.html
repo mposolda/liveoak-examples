@@ -13,6 +13,9 @@
         max-height: 10em;
         overflow: scroll;
       }
+      #user-info {
+        font-weight: bold;
+      }
       .message {
         clear: both;
       }
@@ -27,14 +30,17 @@
     <h1>Chat Example</h1>
 
     <div id="input">
-      <form>
-        <div>
-          <label>Your name</label>
-          <input type="text" name="name" id="name-field"/>
-        </div>
-        <div id="messages">
-        </div>
+      <div id="user-info">
+        Unauthenticated
+      </div>
 
+      <button id="logout">Logout</button>
+
+
+      <div id="messages">
+      </div>
+
+      <form>
         <div>
           <label>Your message</label>
           <input type="text" name="text" size="80" id="text-field"/>

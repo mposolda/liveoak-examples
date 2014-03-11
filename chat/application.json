@@ -22,6 +22,18 @@
         host: 'localhost',
         port: 27017
       }
+    },
+
+    auth: {
+      type: 'keycloak'
+    },
+
+    authz: {
+      type: 'security'
+    },
+
+    uriPolicy: {
+      type: 'uriPolicy'
     }
   }
 }

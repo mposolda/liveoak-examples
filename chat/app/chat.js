@@ -1,7 +1,20 @@
 
 
 $( function() {
-  var liveoak = new LiveOak( { host: "localhost", port: 8080 } );
+  var liveoak = new LiveOak( {
+      host: "localhost",
+      port: 8080,
+      auth: {
+        clientId: 'chat',
+        realm: 'chat',
+        onload: 'login-required'
+      }
+    }
+  );
+
+  liveoak.auth.init(authCallback, function(data) {
+    alert( "authentication failed: " + data.error );
+  });
 
   function add_message(data) {
     $( '#messages' ).append( 
@@ -11,28 +24,40 @@ $( function() {
     $( '#messages' ).scrollTop( $('#messages')[0].scrollHeight );
   }
 
-  liveoak.connect( function() {
-    liveoak.create( '/chat/storage', { id: 'chat' }, {
-      success: function(data) {
-        liveoak.subscribe( '/chat/storage/chat/*', function(data) {
-          add_message( data );
-        } );
-        liveoak.read( '/chat/storage/chat?expand=members', {
-          success: function(data) {
-            $(data._members).each( function(i, e) {
-              add_message( e );
-            } );
-          }
-        } );
-      },
-      error: function(data) {
-        console.log( "chat collection NOT created" );
-      }
+  function authCallback() {
+    $( '#user-info' ).html( "Logged in as: " + liveoak.auth.idToken.preferred_username );
+    liveoak.connect( "Bearer", window.oauth.token, function() {
+      liveoak.create( '/chat/storage', { id: 'chat' }, {
+        success: function(data) {
+
+          liveoak.onStompError( function(frame) {
+            alert("Stomp error received. Details: " + frame);
+          });
+
+          liveoak.subscribe( '/chat/storage/chat/*', function(data) {
+            add_message( data );
+          } );
+          liveoak.read( '/chat/storage/chat?expand=members', {
+            success: function(data) {
+              $(data._members).each( function(i, e) {
+                add_message( e );
+              } );
+            }
+          } );
+        },
+        error: function(data) {
+          alert( "chat Collection NOT created. Error: " + data.status );
+        }
+      } );
     } );
-  } );
-  
+  };
+
+  $('#logout').click(function() {
+    liveoak.auth.logout();
+  });
+
   $('#input form').submit( function() {
-    var name = $( '#name-field' ).val();
+    var name = liveoak.auth.idToken.preferred_username;
     var text = $( '#text-field' ).val();
 
     $('#text-field').val( '' );
@@ -42,8 +67,8 @@ $( function() {
                     { success: function(data) { 
                         console.log( "sent" ); 
                       },
-                      error: function() {
-                        console.log( "error occurred" );
+                      error: function(error) {
+                        alert( error.status + ": " + error.statusText );
                       }
                   } );
     return false;

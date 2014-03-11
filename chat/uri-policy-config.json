@@ -1,0 +1,47 @@
+{
+    "uriRules": [
+        {
+            "priority": 1,
+            "uriPattern": "/chat",
+            "requestType": "READ",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/chat/app*",
+            "requestType": "READ",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/chat/client*",
+            "requestType": "*",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 2,
+            "uriPattern": "/chat/storage*",
+            "requestType": "*",
+            "allowedRoles": "'chat/admin'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/chat/storage/chat",
+            "requestType": "UPDATE",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/chat/storage*",
+            "requestType": "CREATE,UPDATE,READ",
+            "allowedRoles": "'chat/user'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/chat/storage/chat/*",
+            "requestType": "READ",
+            "queryParamsCondition": "$requestState.getProperty('text') != null && $requestState.getProperty('text').toString().startsWith('secret:')",
+            "deniedUsers": "'*'"
+        }
+    ]
+}
